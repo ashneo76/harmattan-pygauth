@@ -143,7 +143,7 @@ Page {
 
 		Connections {
 			target: passcodeGenerator
-			onPinChanged: { console.log("Pin changed to: " + passcodeGenerator.pin); animateOpacity.stop(); pinLabel.opacity = 1.0 }
+			onPinChanged: { animateOpacity.stop(); pinLabel.opacity = 1.0 }
 		}
 
 		Component.onCompleted: {
