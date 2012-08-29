@@ -4,7 +4,7 @@ import com.nokia.meego 1.0
 PageStackWindow {
     id: appWindow
 
-    property string version: "1.3"
+    property string version: "1.2"
 
     initialPage: mainPage
 
@@ -63,6 +63,10 @@ PageStackWindow {
 //					}
 //				}
 //			}
+			MenuItem {
+				text: qsTr("Remove this account")
+				onClicked: passcodeGenerator.removeCurrent()
+			}
 			MenuItem {
 				text: qsTr((mainPage.help.visible ? "Hide" : "Show") + " help")
 				onClicked: mainPage.help.visible = !mainPage.help.visible

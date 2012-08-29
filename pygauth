@@ -37,25 +37,28 @@ class Host(QtCore.QObject):
 
 	root = QtCore.Property(str, _get_root, notify=rootChanged)
 
-
 class PasscodeGenerator(QtCore.QObject):
 	def __init__(self, secret=str()):
 		QtCore.QObject.__init__(self)
 		self._fixed = len(secret) > 0
 		if (self._fixed):
-			self._secret = secret
-			self._name = 'PIN'
+			self._secret = self._secrets = secret
+			self._name = self._names = 'PIN'
 		else:
-			self._secret = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret')
-			self._name = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name')
-			self.secretChanged.connect(self.saveSecret)
-			self.nameChanged.connect(self.saveName)
+			self._secrets = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret')
+			self._secret = self._secrets.split(",")[0]
+			self._names = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name')
+			self._name = self._names.split(",")[0]
+		if self._names == "":
+			self._name = "No accounts"
+		self._index = 0
 		self._pin = 'No secret'
 		self._timer = QtCore.QTimer(self)
 		self._timer.setSingleShot(True)
 		self._timer.timeout.connect(self.pinExpired)
 		self.secretChanged.connect(self.updatePin)
 		self.validityUpdated.connect(self.updatePin)
+		self.indexUpdated.connect(self.changeIndex)
 		#self.connect(self._timer, SIGNAL("timeout()"), self.pinExpired)
 		#self.connect(self, SIGNAL("on_new_secret()"), self.updatePin)
 		#self.connect(self, SIGNAL("on_new_validity()"), self.updatePin)
@@ -75,8 +78,19 @@ class PasscodeGenerator(QtCore.QObject):
 				secret = s[1]
 		if secret is None:
 			return False
-		self._set_name(name)
-		self._set_secret(secret)
+		if len(self._secrets) == 0:
+			self._secrets = secret
+		else:
+			self._secrets = secret + "," + self._secrets
+		if len(self._names) == 0:
+			self._names = name.translate(None, ",")
+		else:
+			self._names = name.translate(None, ",") + "," + self._names
+		self.name = name
+		self.secret = secret
+		self.index = 0
+		self.saveSecrets()
+		self.saveNames()
 		return True
 
 	def _get_secret(self):
@@ -95,11 +109,22 @@ class PasscodeGenerator(QtCore.QObject):
 			self._name = name
 			self.nameChanged.emit()
 
+	def _get_index(self):
+		return self._index
+
+	def _set_index(self, index):
+		if (index != self._index and index >= 0 and index < len(self.names.split(","))):
+			self._index = index
+			self.indexUpdated.emit()
+
 	def _get_pin(self):
 		return self._pin
 
 	def _get_validity(self):
 		return 30 - fmod(time(), 30)
+
+	def _get_names(self):
+		return self._names
 
 	@QtCore.Slot()
 	def pinExpired(self):
@@ -113,7 +138,23 @@ class PasscodeGenerator(QtCore.QObject):
 			return
 
 		# The secret is recorded in base32
-		secret = b32decode(self._secret, True)
+		secret = self._secret.upper().translate(None, "-= ")
+
+		if (len(secret) * 5) % 8 == 0:
+			result = b32decode(self._secret)
+		else:
+			alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+			buffer = 0
+			next = 0
+			bitsLeft = 0
+			result = bytearray()
+			for c in secret:
+				buffer <<= 5
+				buffer |= alphabet.index(c) & 31
+				bitsLeft += 5
+				if bitsLeft >= 8:
+					result.append((buffer >> (bitsLeft - 8)) & 255)
+					bitsLeft -= 8
 
 		# The timer is every 30 seconds
 		now = time()
@@ -123,7 +164,7 @@ class PasscodeGenerator(QtCore.QObject):
 		value = pack("!q", now)
 
 		# The hashing algorithm is HMACSHA1
-		hm = hmac.new(secret, value, sha1)
+		hm = hmac.new(str(result), value, sha1)
 
 		# Get the resulting binary digest
 		digest = hm.digest()
@@ -136,12 +177,36 @@ class PasscodeGenerator(QtCore.QObject):
 			self.pinChanged.emit()
 
 	@QtCore.Slot()
-	def saveSecret(self):
-		gconf.client_get_default().set_string('/apps/ControlPanel/PyGAuth/Secret', self._secret)
+	def saveSecrets(self):
+		gconf.client_get_default().set_string('/apps/ControlPanel/PyGAuth/Secret', self._secrets)
 
 	@QtCore.Slot()
-	def saveName(self):
-		gconf.client_get_default().set_string('/apps/ControlPanel/PyGAuth/Name', self._name)
+	def saveNames(self):
+		gconf.client_get_default().set_string('/apps/ControlPanel/PyGAuth/Name', self._names)
+
+	@QtCore.Slot()
+	def changeIndex(self):
+		self.secret = self._secrets.split(",")[self.index]
+		self.name = self._names.split(",")[self.index]
+
+	@QtCore.Slot()
+	def removeCurrent(self):
+		l = self._secrets.split(",")
+		del l[self.index]
+		self._secrets = ",".join(l)
+		l = self._names.split(",")
+		del l[self.index]
+		self._names = ",".join(l)
+		self.saveSecrets()
+		self.saveNames()
+		if self.index > 0:
+			self.index = self.index - 1
+		else:
+			self.name = self.secret = ""
+		if self._names == "":
+			self.name = "No accounts"
+			self._pin = "No secret"
+			self.pinChanged.emit()
 
 	@QtCore.Slot()
 	def openSettings(self):
@@ -158,20 +223,29 @@ class PasscodeGenerator(QtCore.QObject):
 
 	@QtCore.Slot()
 	def readConfig(self):
-		self.secret = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret')
-		self.name = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name')
-
+		self._secrets = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret')
+		self._names = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name')
+		if self.index >= len(self._names.split(",")):
+			self.index = 0
+		self.secret = self._secrets.split(",")[self.index]
+		if self._names == "":
+			self.name = "No accounts"
+		else:
+			self.name = self._names.split(",")[self.index]
 
 	secretChanged = QtCore.Signal()
 	nameChanged = QtCore.Signal()
 	pinChanged = QtCore.Signal()
 	validityUpdated = QtCore.Signal()
+	indexUpdated = QtCore.Signal()
 
 	secret = QtCore.Property(str, _get_secret, _set_secret, notify=secretChanged)
 	name = QtCore.Property(str, _get_name, _set_name, notify=nameChanged)
 	pin = QtCore.Property(str, _get_pin, notify=pinChanged)
 	validity = QtCore.Property(float, _get_validity, notify=validityUpdated)
+	index = QtCore.Property(int, _get_index, _set_index, notify=indexUpdated)
 
+	names = QtCore.Property(str, _get_names)
 
 def main():
 

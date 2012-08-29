@@ -27,6 +27,26 @@ Page {
 			horizontalAlignment: Text.AlignHCenter
 			verticalAlignment: Text.AlignVCenter
 		}
+		MouseArea {
+			SelectionDialog {
+				id: sel
+				titleText: "Choose PIN"
+				// http://meegoharmattandev.blogspot.com.au/2011/07/populating-selectiondialog-from-c.html?m=1http://meegoharmattandev.blogspot.com.au/2011/07/populating-selectiondialog-from-c.html?m=1
+				selectedIndex: 0
+				model: ListModel {}
+				onSelectedIndexChanged: {
+					passcodeGenerator.index = sel.selectedIndex; 
+					sel.close(); 
+				}
+			}
+			anchors.fill: parent
+			onClicked: { 
+				sel.model.clear();
+				var n = passcodeGenerator.names.split(",");
+				for (var i = 0; i < n.length; i++) sel.model.append({ name: n[i] });
+				sel.open();
+			}
+		}
 		anchors.top: parent.top
 		anchors.left: parent.left
 		width: parent.width
