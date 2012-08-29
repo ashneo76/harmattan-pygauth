@@ -1,9 +1,12 @@
 This Authenticator generates tokens for use with
 two-step verification with Google's online services.
+It is also usable with services which make themselves compatible with
+Authenticator, including Dropbox.
 Simply copy your Authenticator key into the phone's
 Settings application or use the link/QR code provided
 to set up the token. This application will then
 constantly update with the current login code.
+You may set up multiple accounts in the settings by comma-separating them.
 Please note that your phone's time must be correct
 in order to generate valid codes.
 No data is consumed by this application.
