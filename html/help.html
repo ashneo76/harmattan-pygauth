@@ -6,22 +6,30 @@
                 bottom toolbar and then tap <b>Hide help</b>.</p>
                 <p>To see more information, go online to
                 <u>http://techtransit.blogspot.com/p/gauth.html</u>.</p>
+		<h2>Compatible services</h2>
+		<p><i>GAuth</i> should be compatible with all services that support
+		<i>Google Authenticator</i>. It has been tested with:</p>
+		<ul>
+		<li>Google Accounts</li>
+		<li>Dropbox</li>
+		</ul>
                 <h2>Setting up your account</h2>
                 <p><b>Note:</b> If you have previously set up an Authenticator
                 on a different device you will need to repeat the process (ie,
                 redo on Google) unless you recorded the secret. The secret
-                cannot be extracted from <i>Google Authenticator</i> by an end
-                user. If you did record the secret skip to step ? below.</p>
+                cannot be extracted from <i>Google Authenticator</i> or other
+		services by an end
+                user. If you did record the secret skip to step 3.3 below.</p>
                 <p>To set up your account, go to Google's two-step
                 authentication settings at <u>https://account.google.com</u> on
                 your phone or computer web browser and follow these steps:</p>
                 <ol>
-                	<li>Follow Google's process, selecting <b>Android</b>
-                        when asked to identify your device.</li>
+                	<li>Follow Google's or other online services' process,
+			selecting <b>Android</b> when asked to identify your device.</li>
                         <li>If on a computer:
                         	<ol>
                                     <li>Scan the QR code with the <i>MeeScan</i>
-                                    application.</li>
+				    or <i>CodeCam</i> application.</li>
                                     <li>Once the code is recognised, <b>copy
                                     all</b> of the text to the clipboard.</li>
                                     <li>Open the <i>Web</i> application and
@@ -46,22 +54,36 @@
                                         phone and copy the secret to the
                                         clipboard again.</li>
                                         <li>Enter the name you would like for
-                                        the token in the <b>Name</b> area.</li>
+                                        the token in the <b>Name</b> area. If you are
+					adding a token then go to the end of the
+					current text, put a comma "," then the new
+					name. Do not use commas in the name.</li>
                                 	<li>Paste the secret into the
-                                        <b>Secret</b> area.</li>
+                                        <b>Secret</b> area. If you are adding a token
+					then go to the end of the current text, put a
+					"," then the new secret.</li>
                                         <li>Quit the settings screen and return
                                         to <i>GAuth</i>. It should now reload
                                         with the new token.</li>
                                 </ol></li>
                 </ol>
+		<p>Simply repeat the process for every token you need. <i>GAuth</i>
+		maintains an ordered list of all of your tokens.</p>
                 <h2>Using the token</h2>
-                <p>To use the token simply load <i>GAuth</i> when Google requests
-                a code. Then type the value displayed into the web browser. If
-                the Google request is on the phone itself you can press
-                <b>Copy</b> on the bottom toolbar and then use paste in the
-                Google form. The code autmatically updates every 30 seconds and
+                <p>To use the token simply load <i>GAuth</i> when Google or other
+		online service requests a code. If the current token is not the one
+		you are after, tap the blue header and choose the token you want from
+		the <i>Choose PIN</i> list.
+		Then type the value displayed into the web browser. If
+                the request is on the phone itself you can press
+                <b>Copy</b> on the bottom toolbar and then use Paste in the
+                text box on the form.</p>
+		<p>The code automatically updates every 30 seconds and
                 turns red to indicate when it is about to expire.</p>
                 <p>If <i>No secret</i> is shown, you must first redo the setup
                 procedure above.</p>
+		<p>If you no longer have use for a particular token, make it active
+		and then select <b>Remove this account</b> from the menu button.</p>
+		<p>An inverted mode can be enabled from the Settings.</p>
         </body>
 </html>
