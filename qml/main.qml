@@ -14,7 +14,7 @@ PageStackWindow {
 
     Connections {
         target: platformWindow
-	onActiveChanged: if (platformWindow.active) passcodeGenerator.readConfig()
+	onActiveChanged: if (platformWindow.active) { passcodeGenerator.readConfig(); theme.inverted = passcodeGenerator.inverted; }
     }
 
     TextField {

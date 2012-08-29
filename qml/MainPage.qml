@@ -104,7 +104,7 @@ Page {
 		verticalAlignment: Text.AlignVCenter
 		platformStyle: LabelStyle {
 			id: pinStyle
-			textColor: "#000099"
+			textColor: passcodeGenerator.inverted ? "#999999" : "#000099"
 			fontPixelSize: (parent.width > parent.height) ? 0.5 * parent.height : 0.25 * parent.width
 		}
 
@@ -121,7 +121,7 @@ Page {
 			id: animateColor
 			target: pinStyle
 			properties: "textColor"
-			from: "#000099"
+			from: passcodeGenerator.inverted ? "#999999" : "#000099"
 			to: "#990000"
 			easing.type: Easing.InQuart
 		}

@@ -53,6 +53,10 @@ class PasscodeGenerator(QtCore.QObject):
 			self._name = "No accounts"
 		self._index = 0
 		self._pin = 'No secret'
+		value = gconf.client_get_default().get_bool('/apps/ControlPanel/PyGAuth/Inverted')
+		if value is None:
+			value = False
+		self._inverted = value
 		self._timer = QtCore.QTimer(self)
 		self._timer.setSingleShot(True)
 		self._timer.timeout.connect(self.pinExpired)
@@ -125,6 +129,14 @@ class PasscodeGenerator(QtCore.QObject):
 
 	def _get_names(self):
 		return self._names
+
+	def _get_inverted(self):
+		return self._inverted
+
+	def _set_inverted(self, inverted):
+		if inverted != self.inverted:
+			self._inverted = inverted
+			self.invertedChanged.emit()
 
 	@QtCore.Slot()
 	def pinExpired(self):
@@ -232,18 +244,24 @@ class PasscodeGenerator(QtCore.QObject):
 			self.name = "No accounts"
 		else:
 			self.name = self._names.split(",")[self.index]
+		value = gconf.client_get_default().get_bool('/apps/ControlPanel/PyGAuth/Inverted')
+		if value is None:
+			value = True
+		self.inverted = value
 
 	secretChanged = QtCore.Signal()
 	nameChanged = QtCore.Signal()
 	pinChanged = QtCore.Signal()
 	validityUpdated = QtCore.Signal()
 	indexUpdated = QtCore.Signal()
+	invertedChanged = QtCore.Signal()
 
 	secret = QtCore.Property(str, _get_secret, _set_secret, notify=secretChanged)
 	name = QtCore.Property(str, _get_name, _set_name, notify=nameChanged)
 	pin = QtCore.Property(str, _get_pin, notify=pinChanged)
 	validity = QtCore.Property(float, _get_validity, notify=validityUpdated)
 	index = QtCore.Property(int, _get_index, _set_index, notify=indexUpdated)
+	inverted = QtCore.Property(bool, _get_inverted, _set_inverted, notify=invertedChanged)
 
 	names = QtCore.Property(str, _get_names)
 

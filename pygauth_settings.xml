@@ -4,4 +4,7 @@
 		<text key="/apps/ControlPanel/PyGAuth/Name" title="Name"/>
 		<text key="/apps/ControlPanel/PyGAuth/Secret" title="Secret" />
 	</group>
+	<group title="View">
+		<boolean key="/apps/ControlPanel/PyGAuth/Inverted" title="Inverted" />
+	</group>
 </settings>
