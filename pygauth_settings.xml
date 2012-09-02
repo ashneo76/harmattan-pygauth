@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <settings>
 	<group title="General">
-		<text key="/apps/ControlPanel/PyGAuth/Name" title="Name"/>
-		<text key="/apps/ControlPanel/PyGAuth/Secret" title="Secret" />
+		<text key="/apps/ControlPanel/PyGAuth/Name" title="Name(s)"/>
+		<text key="/apps/ControlPanel/PyGAuth/Secret" title="Secret(s)" />
 	</group>
 	<group title="View">
 		<boolean key="/apps/ControlPanel/PyGAuth/Inverted" title="Inverted" />
