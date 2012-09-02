@@ -45,9 +45,9 @@ class PasscodeGenerator(QtCore.QObject):
 			self._secret = self._secrets = secret
 			self._name = self._names = 'PIN'
 		else:
-			self._secrets = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret')
+			self._secrets = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret') or str()
 			self._secret = self._secrets.split(",")[0]
-			self._names = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name')
+			self._names = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name') or str()
 			self._name = self._names.split(",")[0]
 		if self._names == "":
 			self._name = "No accounts"
@@ -235,8 +235,8 @@ class PasscodeGenerator(QtCore.QObject):
 
 	@QtCore.Slot()
 	def readConfig(self):
-		self._secrets = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret')
-		self._names = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name')
+		self._secrets = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Secret') or str()
+		self._names = gconf.client_get_default().get_string('/apps/ControlPanel/PyGAuth/Name') or str()
 		if self.index >= len(self._names.split(",")):
 			self.index = 0
 		self.secret = self._secrets.split(",")[self.index]
