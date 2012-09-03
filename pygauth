@@ -153,7 +153,7 @@ class PasscodeGenerator(QtCore.QObject):
 		secret = self._secret.upper().translate(None, "-= ")
 
 		if (len(secret) * 5) % 8 == 0:
-			result = b32decode(self._secret)
+			result = b32decode(self._secret, True)
 		else:
 			alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 			buffer = 0
